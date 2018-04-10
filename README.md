@@ -2,7 +2,7 @@
 Creates a backup of your Coffee MUD folder
 
 Official support sites: [Official Github Repo](https://github.com/fstltna/CoffeeBackup) - [Official Forum](https://pocketmud.com/index.php/forum/server-utils)  - [Official Download Area](https://pocketmud.com/index.php/download-upload/category/4-servers)
-![Coffee MUD Sample Screen](https://pocketmud.com/minetest_demo.png) 
+![Coffee MUD Sample Screen](https://pocketmud.com/coffee_mud.png) 
 
 ---
 
