@@ -9,7 +9,7 @@ Official support sites: [Official Github Repo](https://github.com/fstltna/Coffee
 1. Edit the settings at the top of minebackup.pl if needed
 2. create a cron job like this:
 
-        1 1 * * * /home/marisag/bin/coffeebackup.pl
+        1 1 * * * /home/root/bin/coffeebackup.pl
 
 3. This will back up your Coffee MUD installation at 1:01am each day, and keep the last 5 backups.
 
