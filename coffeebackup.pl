@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 # Set these for your situation
-my $MTDIR = "/home/marisag/CoffeeMud";
-my $BACKUPDIR = "/home/marisag/backups";
+my $MTDIR = "/root/CoffeeMud";
+my $BACKUPDIR = "/root/backups";
 my $TARCMD = "/bin/tar czf";
 
 #-------------------
