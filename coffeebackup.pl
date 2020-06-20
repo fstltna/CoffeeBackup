@@ -1,15 +1,15 @@
 #!/usr/bin/perl
 
 # Set these for your situation
-my $MTDIR = "/root/CoffeeMud";
-my $BACKUPDIR = "/root/backups";
+my $MTDIR = "/home/cmowner/CoffeeMud";
+my $BACKUPDIR = "/home/cmowner/backups";
 my $SQLDUMPDIR = "$BACKUPDIR/sqldump/";
 my $TARCMD = "/bin/tar czf";
 
 #-------------------
 # No changes below here...
 #-------------------
-my $VERSION = "1.1";
+my $VERSION = "1.2";
 
 print "CoffeeBackup.pl version $VERSION\n";
 print "========================\n";
