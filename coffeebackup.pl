@@ -45,7 +45,7 @@ system("$TARCMD $BACKUPDIR/coffeebackup-1.tgz $MTDIR");
 print "Done\nMoving Existing MySQL data: ";
 if (-f "$SQLDUMPDIR/coffeemud.sql-5.gz")
 {
-	unlink("$SQLDUMPDIR/coffeemud.sql-5.gz")  or warn "Could not unlink $SQLDUMPDIR/coffeeimud.sql-5.gz: $!";
+	unlink("$SQLDUMPDIR/coffeemud.sql-5.gz")  or warn "Could not unlink $SQLDUMPDIR/coffeemud.sql-5.gz: $!";
 }
 if (-f "$SQLDUMPDIR/coffeemud.sql-4.gz")
 {
