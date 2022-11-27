@@ -61,11 +61,16 @@ if (defined $CMDOPTION)
 	{
 		unlink("$BACKUPDIR/snapshot.tgz");
 	}
-	system("$TARCMD $BACKUPDIR/snapshot.tgz $MTDIR");
+	system("$TARCMD $BACKUPDIR/snapshot.tgz $MTDIR > /dev/null 2>\&1");
 	print "\nBackup Completed.\nBacking up MYSQL data: ";
+	if (-f "$SQLDUMPDIR/snapshot.sql")
+	{
+		unlink("$SQLDUMPDIR/snapshot.sql");
+	}
 	ReadPrefs();
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
-	system("$SQLDUMPCMD $BACKUPDIR/snapshot.tgz $MTDIR");
+	system("$SQLDUMPCMD  --user=$MYSQLUSER --password=$MYSQLPSWD --result-file=$SQLDUMPDIR/snapshot.sql coffeemud");
+
 	print "\n";
 	print "--- Press Enter To Continue: ";
 	my $entered = <STDIN>;
