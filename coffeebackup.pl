@@ -5,11 +5,76 @@ my $MTDIR = "/home/cmowner/CoffeeMud";
 my $BACKUPDIR = "/home/cmowner/backups";
 my $SQLDUMPDIR = "$BACKUPDIR/sqldump/";
 my $TARCMD = "/bin/tar czf";
+my $SQLDUMPCMD = "/usr/bin/mysqldump";
+my $VERSION = "1.3";
+my $OPTION_FILE = "/home/cmowner/.cmbackuprc";
+
+my $MYSQLUSER = "";
+my $MYSQLPSWD = "";
+
+# Get if they said a option
+my $CMDOPTION = shift;
+
+sub ReadPrefs
+{
+	my $LineCount = 0;
+	open(my $fh, '<:encoding(UTF-8)', $OPTION_FILE)
+		or die "Could not open file '$OPTION_FILE' $!";
+
+	while (my $row = <$fh>)
+	{
+		chomp $row;
+		if ($LineCount == 0)
+		{
+			$MYSQLUSER = $row;
+		}
+		if ($LineCount == 1)
+		{
+			$MYSQLPSWD = $row;
+		}
+		$LineCount += 1;
+	}
+	close($fh);
+	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
+}
+
+if (defined $CMDOPTION)
+{
+	if ($CMDOPTION ne "-snapshot")
+	{
+		print "Unknown command line option: '$CMDOPTION'\nOnly allowed option is '-snapshot'\n";
+		exit 0;
+	}
+	print "CoffeeBackup.pl version $VERSION\n";
+	print "Running Manual Snapshot\n";
+	print "========================\n";
+	if (! -f $OPTION_FILE)
+	{
+		print "Unable to open '$OPTION_FILE'. Please create it with your mysql data in this format:\n";
+		print "First line - mysql user\nSecond line = mysql-password\n";
+		print "--- Press Enter To Continue: ";
+		my $entered = <STDIN>;
+		exit 0;
+	}
+	print "Backing up java files: ";
+	if (-f "$BACKUPDIR/snapshot.tgz")
+	{
+		unlink("$BACKUPDIR/snapshot.tgz");
+	}
+	system("$TARCMD $BACKUPDIR/snapshot.tgz $MTDIR");
+	print "\nBackup Completed.\nBacking up MYSQL data: ";
+	ReadPrefs();
+	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
+	system("$SQLDUMPCMD $BACKUPDIR/snapshot.tgz $MTDIR");
+	print "\n";
+	print "--- Press Enter To Continue: ";
+	my $entered = <STDIN>;
+	exit 0;
+}
 
 #-------------------
 # No changes below here...
 #-------------------
-my $VERSION = "1.2";
 
 print "CoffeeBackup.pl version $VERSION\n";
 print "========================\n";
