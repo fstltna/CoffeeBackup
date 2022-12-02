@@ -6,7 +6,7 @@ my $BACKUPDIR = "/home/cmowner/backups";
 my $SQLDUMPDIR = "$BACKUPDIR/sqldump/";
 my $TARCMD = "/bin/tar czf";
 my $SQLDUMPCMD = "/usr/bin/mysqldump";
-my $VERSION = "1.3";
+my $VERSION = "1.3.1";
 my $OPTION_FILE = "/home/cmowner/.cmbackuprc";
 
 my $MYSQLUSER = "";
