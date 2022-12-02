@@ -72,8 +72,6 @@ if (defined $CMDOPTION)
 	system("$SQLDUMPCMD  --user=$MYSQLUSER --password=$MYSQLPSWD --result-file=$SQLDUMPDIR/snapshot.sql coffeemud");
 
 	print "\n";
-	print "--- Press Enter To Continue: ";
-	my $entered = <STDIN>;
 	exit 0;
 }
 
