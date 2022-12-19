@@ -3,12 +3,12 @@
 # Set these for your situation
 my $MTDIR = "/home/cmowner/CoffeeMud";
 my $BACKUPDIR = "/home/cmowner/backups";
-my $SQLDUMPDIR = "$BACKUPDIR/sqldump/";
 my $TARCMD = "/bin/tar czf";
 my $SQLDUMPCMD = "/usr/bin/mysqldump";
-my $VERSION = "1.3.1";
+my $VERSION = "1.4.0";
 my $OPTION_FILE = "/home/cmowner/.cmbackuprc";
-
+my $LATESTFILE = "$BACKUPDIR/coffeemud.sql-1";
+my $DOSNAPSHOT = 0;
 my $MYSQLUSER = "";
 my $MYSQLPSWD = "";
 
@@ -38,16 +38,11 @@ sub ReadPrefs
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
 }
 
-if (defined $CMDOPTION)
+ReadPrefs();
+
+sub DumpMysql
 {
-	if ($CMDOPTION ne "-snapshot")
-	{
-		print "Unknown command line option: '$CMDOPTION'\nOnly allowed option is '-snapshot'\n";
-		exit 0;
-	}
-	print "CoffeeBackup.pl version $VERSION\n";
-	print "Running Manual Snapshot\n";
-	print "========================\n";
+	my $DUMPFILE = $_[0];
 	if (! -f $OPTION_FILE)
 	{
 		print "Unable to open '$OPTION_FILE'. Please create it with your mysql data in this format:\n";
@@ -56,6 +51,27 @@ if (defined $CMDOPTION)
 		my $entered = <STDIN>;
 		exit 0;
 	}
+	print "Backing up MYSQL data: ";
+	if (-f "$DUMPFILE")
+	{
+		unlink("$DUMPFILE");
+	}
+	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
+	system("$SQLDUMPCMD  --user=$MYSQLUSER --password=$MYSQLPSWD --result-file=$DUMPFILE coffeemud");
+	print "\n";
+}
+
+if (defined $CMDOPTION)
+{
+	if ($CMDOPTION ne "-snapshot")
+	{
+		print "Unknown command line option: '$CMDOPTION'\nOnly allowed option is '-snapshot'\n";
+		exit 0;
+	}
+}
+
+sub SnapShotFunc
+{
 	print "Backing up java files: ";
 	if (-f "$BACKUPDIR/snapshot.tgz")
 	{
@@ -63,29 +79,42 @@ if (defined $CMDOPTION)
 	}
 	system("$TARCMD $BACKUPDIR/snapshot.tgz $MTDIR > /dev/null 2>\&1");
 	print "\nBackup Completed.\nBacking up MYSQL data: ";
-	if (-f "$SQLDUMPDIR/snapshot.sql")
+	if (-f "$BACKUPDIR/snapshot.sql")
 	{
-		unlink("$SQLDUMPDIR/snapshot.sql");
+		unlink("$BACKUPDIR/snapshot.sql");
 	}
-	ReadPrefs();
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
-	system("$SQLDUMPCMD  --user=$MYSQLUSER --password=$MYSQLPSWD --result-file=$SQLDUMPDIR/snapshot.sql coffeemud");
-
+	DumpMysql("$BACKUPDIR/snapshot.sql");
 	print "\n";
-	exit 0;
 }
 
 #-------------------
 # No changes below here...
 #-------------------
 
+if ((defined $CMDOPTION) && ($CMDOPTION eq "-snapshot"))
+{
+	$DOSNAPSHOT = -1;
+}
+
 print "CoffeeBackup.pl version $VERSION\n";
-print "========================\n";
+if ($DOSNAPSHOT == -1)
+{
+	print "Running Manual Snapshot\n";
+}
+print "==============================\n";
+
 if (! -d $BACKUPDIR)
 {
 	print "Backup dir $BACKUPDIR not found, creating...\n";
 	system("mkdir -p $BACKUPDIR");
 }
+if ($DOSNAPSHOT == -1)
+{
+	SnapShotFunc();
+	exit 0;
+}
+
 print "Moving existing backups: ";
 
 if (-f "$BACKUPDIR/coffeebackup-5.tgz")
@@ -111,29 +140,26 @@ if (-f "$BACKUPDIR/coffeebackup-1.tgz")
 print "Done\nCreating New Backup: ";
 system("$TARCMD $BACKUPDIR/coffeebackup-1.tgz $MTDIR");
 print "Done\nMoving Existing MySQL data: ";
-if (-f "$SQLDUMPDIR/coffeemud.sql-5.gz")
+if (-f "$BACKUPDIR/coffeemud.sql-5")
 {
-	unlink("$SQLDUMPDIR/coffeemud.sql-5.gz")  or warn "Could not unlink $SQLDUMPDIR/coffeemud.sql-5.gz: $!";
+	unlink("$BACKUPDIR/coffeemud.sql-5")  or warn "Could not unlink $BACKUPDIR/coffeemud.sql-5: $!";
 }
-if (-f "$SQLDUMPDIR/coffeemud.sql-4.gz")
+if (-f "$BACKUPDIR/coffeemud.sql-4")
 {
-	rename("$SQLDUMPDIR/coffeemud.sql-4.gz", "$SQLDUMPDIR/coffeemud.sql-5.gz");
+	rename("$BACKUPDIR/coffeemud.sql-4", "$BACKUPDIR/coffeemud.sql-5");
 }
-if (-f "$SQLDUMPDIR/coffeemud.sql-3.gz")
+if (-f "$BACKUPDIR/coffeemud.sql-3")
 {
-	rename("$SQLDUMPDIR/coffeemud.sql-3.gz", "$SQLDUMPDIR/coffeemud.sql-4.gz");
+	rename("$BACKUPDIR/coffeemud.sql-3", "$BACKUPDIR/coffeemud.sql-4");
 }
-if (-f "$SQLDUMPDIR/coffeemud.sql-2.gz")
+if (-f "$BACKUPDIR/coffeemud.sql-2")
 {
-	rename("$SQLDUMPDIR/coffeemud.sql-2.gz", "$SQLDUMPDIR/coffeemud.sql-3.gz");
+	rename("$BACKUPDIR/coffeemud.sql-2", "$BACKUPDIR/coffeemud.sql-3");
 }
-if (-f "$SQLDUMPDIR/coffeemud.sql-1.gz")
+if (-f "$BACKUPDIR/coffeemud.sql-1")
 {
-	rename("$SQLDUMPDIR/coffeemud.sql-1.gz", "$SQLDUMPDIR/coffeemud.sql-2.gz");
+	rename("$BACKUPDIR/coffeemud.sql-1", "$BACKUPDIR/coffeemud.sql-2");
 }
-if (-f "$SQLDUMPDIR/coffeemud.sql.gz")
-{
-	rename("$SQLDUMPDIR/coffeemud.sql.gz", "$SQLDUMPDIR/coffeemud.sql-1.gz");
-}
+DumpMysql($LATESTFILE);
 print("Done!\n");
 exit 0;
