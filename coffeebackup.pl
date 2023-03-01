@@ -38,8 +38,6 @@ sub ReadPrefs
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
 }
 
-ReadPrefs();
-
 sub DumpMysql
 {
 	my $DUMPFILE = $_[0];
@@ -51,6 +49,8 @@ sub DumpMysql
 		my $entered = <STDIN>;
 		exit 0;
 	}
+	ReadPrefs();
+
 	print "Backing up MYSQL data: ";
 	if (-f "$DUMPFILE")
 	{
