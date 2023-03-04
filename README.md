@@ -1,4 +1,4 @@
-# CoffeeBackup backup script for Coffee MUD (1.4.0)
+# CoffeeBackup backup script for Coffee MUD (1.5.0)
 Creates a backup of your Coffee MUD folder
 
 Official support sites: [Official Github Repo](https://github.com/fstltna/CoffeeBackup) - [Official Forum](https://pocketmud.com/index.php/forum/server-utils)  - [Official Download Area](https://pocketmud.com/index.php/download-upload/category/4-servers)
