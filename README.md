@@ -15,4 +15,7 @@ Official support sites: [Official Github Repo](https://github.com/fstltna/Coffee
 
 4. This assumes that backupninja is storing the daily backups to /home/cmowner/backups and it rotates those sql dumps as well.
 
+5. Edit the backup config:
+	vi /home/cmowner/.cmbackuprc # For first line put "coffeemud", for second line put the password you set above
+
 If you need more help visit https://PocketMUD.com/
