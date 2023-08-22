@@ -5,7 +5,7 @@ my $MTDIR = "/home/cmowner/CoffeeMud";
 my $BACKUPDIR = "/home/cmowner/backups";
 my $TARCMD = "/bin/tar czf";
 my $SQLDUMPCMD = "/usr/bin/mysqldump";
-my $VERSION = "1.6.0";
+my $VERSION = "1.7.0";
 my $OPTION_FILE = "/home/cmowner/.cmbackuprc";
 my $LATESTFILE = "$BACKUPDIR/coffeemud.sql-1";
 my $DOSNAPSHOT = 0;
@@ -59,11 +59,11 @@ sub ReadPrefs
 		{
 			$MYSQLUSER = $row;
 		}
-		if ($LineCount == 1)
+		elsif ($LineCount == 1)
 		{
 			$MYSQLPSWD = $row;
 		}
-		if ($LineCount == 2)
+		elsif ($LineCount == 2)
 		{
 			$MYSQLDBNAME = $row;
 		}
@@ -83,7 +83,7 @@ sub DumpMysql
 		unlink("$DUMPFILE");
 	}
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
-	system("$SQLDUMPCMD  --user=$MYSQLUSER --password=$MYSQLPSWD --result-file=$DUMPFILE $MYSQLDBNAME");
+	system("$SQLDUMPCMD --user=$MYSQLUSER --password=$MYSQLPSWD --result-file=$DUMPFILE $MYSQLDBNAME");
 	print "\n";
 }
 
@@ -161,47 +161,39 @@ print "Moving existing backups: ";
 
 if (-f "$BACKUPDIR/coffeebackup-5.tgz")
 {
-	unlink("$BACKUPDIR/coffeebackup-5.tgz")  or warn "Could not unlink $BACKUPDIR/coffeebackup-5.tgz: $!";
+	unlink("$BACKUPDIR/coffeebackup-5.tgz") or warn "Could not unlink $BACKUPDIR/coffeebackup-5.tgz: $!";
 }
-if (-f "$BACKUPDIR/coffeebackup-4.tgz")
+
+my $FileRevision = 4;
+while ($FileRevision > 0)
 {
-	rename("$BACKUPDIR/coffeebackup-4.tgz", "$BACKUPDIR/coffeebackup-5.tgz");
+	if (-f "$BACKUPDIR/coffeebackup-$FileRevision.tgz")
+	{
+		my $NewVersion = $FileRevision + 1;
+		rename("$BACKUPDIR/coffeebackup-$FileRevision.tgz", "$BACKUPDIR/coffeebackup-$NewVersion.tgz");
+	}
+	$FileRevision -= 1;
 }
-if (-f "$BACKUPDIR/coffeebackup-3.tgz")
-{
-	rename("$BACKUPDIR/coffeebackup-3.tgz", "$BACKUPDIR/coffeebackup-4.tgz");
-}
-if (-f "$BACKUPDIR/coffeebackup-2.tgz")
-{
-	rename("$BACKUPDIR/coffeebackup-2.tgz", "$BACKUPDIR/coffeebackup-3.tgz");
-}
-if (-f "$BACKUPDIR/coffeebackup-1.tgz")
-{
-	rename("$BACKUPDIR/coffeebackup-1.tgz", "$BACKUPDIR/coffeebackup-2.tgz");
-}
+
 print "Done\nCreating New Backup: ";
 system("$TARCMD $BACKUPDIR/coffeebackup-1.tgz $MTDIR");
 print "Done\nMoving Existing MySQL data: ";
 if (-f "$BACKUPDIR/coffeemud.sql-5")
 {
-	unlink("$BACKUPDIR/coffeemud.sql-5")  or warn "Could not unlink $BACKUPDIR/coffeemud.sql-5: $!";
+	unlink("$BACKUPDIR/coffeemud.sql-5") or warn "Could not unlink $BACKUPDIR/coffeemud.sql-5: $!";
 }
-if (-f "$BACKUPDIR/coffeemud.sql-4")
+
+$FileRevision = 4;
+while ($FileRevision > 0)
 {
-	rename("$BACKUPDIR/coffeemud.sql-4", "$BACKUPDIR/coffeemud.sql-5");
+	if (-f "$BACKUPDIR/coffeemud.sql-$FileRevision")
+	{
+		my $NewVersion = $FileRevision + 1;
+		rename("$BACKUPDIR/coffeemud.sql-$FileRevision", "$BACKUPDIR/coffeemud.sql-$NewVersion");
+	}
+	$FileRevision -= 1;
 }
-if (-f "$BACKUPDIR/coffeemud.sql-3")
-{
-	rename("$BACKUPDIR/coffeemud.sql-3", "$BACKUPDIR/coffeemud.sql-4");
-}
-if (-f "$BACKUPDIR/coffeemud.sql-2")
-{
-	rename("$BACKUPDIR/coffeemud.sql-2", "$BACKUPDIR/coffeemud.sql-3");
-}
-if (-f "$BACKUPDIR/coffeemud.sql-1")
-{
-	rename("$BACKUPDIR/coffeemud.sql-1", "$BACKUPDIR/coffeemud.sql-2");
-}
+
 DumpMysql($LATESTFILE);
 print("Done!\n");
 exit 0;
