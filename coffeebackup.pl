@@ -5,12 +5,29 @@ my $MTDIR = "/home/cmowner/CoffeeMud";
 my $BACKUPDIR = "/home/cmowner/backups";
 my $TARCMD = "/bin/tar czf";
 my $SQLDUMPCMD = "/usr/bin/mysqldump";
-my $VERSION = "1.5.0";
+my $VERSION = "1.6.0";
 my $OPTION_FILE = "/home/cmowner/.cmbackuprc";
 my $LATESTFILE = "$BACKUPDIR/coffeemud.sql-1";
 my $DOSNAPSHOT = 0;
 my $MYSQLUSER = "";
 my $MYSQLPSWD = "";
+my $MYSQLDBNAME = "coffeemud";
+my $FILEEDITOR = $ENV{EDITOR};
+
+if ($FILEEDITOR eq "")
+{
+	$FILEEDITOR = "/usr/bin/nano";
+}
+
+my $templatefile = <<'END_TEMPLATE';
+# Put mysql user here
+coffeemud
+# Put mysql password here
+changeme
+# Put database name here
+coffeemud
+END_TEMPLATE
+
 
 # Get if they said a option
 my $CMDOPTION = shift;
@@ -18,12 +35,26 @@ my $CMDOPTION = shift;
 sub ReadPrefs
 {
 	my $LineCount = 0;
+	if (! -f $OPTION_FILE)
+	{
+		open my $fh, '>', "$OPTION_FILE";
+		print ($fh $templatefile);
+		close($fh);
+		system("$FILEEDITOR $OPTION_FILE");
+	}
+
 	open(my $fh, '<:encoding(UTF-8)', $OPTION_FILE)
 		or die "Could not open file '$OPTION_FILE' $!";
 
 	while (my $row = <$fh>)
 	{
 		chomp $row;
+		if (substr($row, 0, 1) eq "#")
+		{
+			# Skip comment lines
+			next;
+		}
+
 		if ($LineCount == 0)
 		{
 			$MYSQLUSER = $row;
@@ -31,6 +62,10 @@ sub ReadPrefs
 		if ($LineCount == 1)
 		{
 			$MYSQLPSWD = $row;
+		}
+		if ($LineCount == 2)
+		{
+			$MYSQLDBNAME = $row;
 		}
 		$LineCount += 1;
 	}
@@ -41,15 +76,6 @@ sub ReadPrefs
 sub DumpMysql
 {
 	my $DUMPFILE = $_[0];
-	if (! -f $OPTION_FILE)
-	{
-		print "Unable to open '$OPTION_FILE'. Please create it with your mysql data in this format:\n";
-		print "First line - mysql user\nSecond line = mysql-password\n";
-		print "--- Press Enter To Continue: ";
-		my $entered = <STDIN>;
-		exit 0;
-	}
-	ReadPrefs();
 
 	print "Backing up MYSQL data: ";
 	if (-f "$DUMPFILE")
@@ -57,15 +83,15 @@ sub DumpMysql
 		unlink("$DUMPFILE");
 	}
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
-	system("$SQLDUMPCMD  --user=$MYSQLUSER --password=$MYSQLPSWD --result-file=$DUMPFILE coffeemud");
+	system("$SQLDUMPCMD  --user=$MYSQLUSER --password=$MYSQLPSWD --result-file=$DUMPFILE $MYSQLDBNAME");
 	print "\n";
 }
 
 if (defined $CMDOPTION)
 {
-	if ($CMDOPTION ne "-snapshot")
+	if (($CMDOPTION ne "-snapshot") && ($CMDOPTION ne "-prefs"))
 	{
-		print "Unknown command line option: '$CMDOPTION'\nOnly allowed option is '-snapshot'\n";
+		print "Unknown command line option: '$CMDOPTION'\nOnly allowed options are '-snapshot' and '-prefs'\n";
 		exit 0;
 	}
 }
@@ -103,6 +129,22 @@ if ($DOSNAPSHOT == -1)
 	print "Running Manual Snapshot\n";
 }
 print "==============================\n";
+
+if ((defined $CMDOPTION) && ($CMDOPTION eq "-prefs"))
+{
+	# Edit the prefs file
+	print "Editing the prefs file\n";
+	if (! -f $OPTION_FILE)
+	{
+		open my $fh, '>', "$OPTION_FILE";
+		print ($fh $templatefile);
+		close($fh);
+	}
+	system("$FILEEDITOR $OPTION_FILE");
+	exit 0;
+}
+
+ReadPrefs();
 
 if (! -d $BACKUPDIR)
 {

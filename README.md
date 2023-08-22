@@ -1,4 +1,4 @@
-# CoffeeBackup backup script for Coffee MUD (1.5.0)
+# CoffeeBackup backup script for Coffee MUD (1.6.0)
 Creates a backup of your Coffee MUD folder
 
 Official support sites: [Official Github Repo](https://github.com/fstltna/CoffeeBackup) - [Official Forum](https://pocketmud.com/index.php/forum/server-utils)  - [Official Download Area](https://pocketmud.com/index.php/download-upload/category/4-servers)
@@ -16,6 +16,6 @@ Official support sites: [Official Github Repo](https://github.com/fstltna/Coffee
 4. This assumes that backupninja is storing the daily backups to /home/cmowner/backups and it rotates those sql dumps as well.
 
 5. Edit the backup config:
-	vi /home/cmowner/.cmbackuprc # For first line put "coffeemud", for second line put the password you set above
+ 	Run a manual backup and it will ask you for the mysql config info. If you need to reconfigure it use the "-prefs" command-line option
 
 If you need more help visit https://PocketMUD.com/
