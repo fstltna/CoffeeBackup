@@ -5,7 +5,7 @@ my $MTDIR = "/home/cmowner/CoffeeMud";
 my $BACKUPDIR = "/home/cmowner/backups";
 my $TARCMD = "/bin/tar czf";
 my $SQLDUMPCMD = "/usr/bin/mysqldump";
-my $VERSION = "1.7.1";
+my $VERSION = "1.7.2";
 my $OPTION_FILE = "/home/cmowner/.cmbackuprc";
 my $LATESTFILE = "$BACKUPDIR/coffeemud.sql-1";
 my $DOSNAPSHOT = 0;
@@ -72,17 +72,17 @@ sub ReadPrefs
 	close($fh);
 	if ($MYSQLUSER eq "")
 	{
-		print "Database username is empty - check the config file with \"coffeebackup -prefs\"\n";
+		print "Database username is empty - check the config file with \"coffeebackup.pl -prefs\"\n";
 		exit;
 	}
 	if ($MYSQLPSWD eq "")
 	{
-		print "Database password is empty - check the config file with \"coffeebackup -prefs\"\n";
+		print "Database password is empty - check the config file with \"coffeebackup.pl -prefs\"\n";
 		exit;
 	}
 	if ($MYSQLDBNAME eq "")
 	{
-		print "Database name is empty - check the config file with \"coffeebackup -prefs\"\n";
+		print "Database name is empty - check the config file with \"coffeebackup.pl -prefs\"\n";
 		exit;
 	}
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
