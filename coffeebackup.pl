@@ -168,6 +168,10 @@ sub SnapShotFunc
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
 	DumpMysql("$BACKUPDIR/snapshot.sql");
 	print "\n";
+	PrintDebugCommand("rsync -avz -e ssh $BACKUPDIR/snapshot.tgz $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH\n");
+        PrintDebugCommand("rsync -avz -e ssh $BACKUPDIR/snapshot.sql $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
+        system ("rsync -avz -e ssh $BACKUPDIR/snapshot.tgz $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
+        system ("rsync -avz -e ssh $BACKUPDIR/snapshot.sql $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
 }
 
 #-------------------
