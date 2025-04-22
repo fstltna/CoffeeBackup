@@ -45,6 +45,18 @@ END_TEMPLATE
 # Get if they said a option
 my $CMDOPTION = shift;
 
+sub PrintDebugCommand
+{
+        if ($DEBUG_MODE eq "off")
+        {
+                return;
+        }
+        my $PassedString = shift;
+        print "About to run:\n$PassedString\n";
+        print "Press Enter To Run This:";
+        my $entered = <STDIN>;
+}
+
 sub ReadPrefs
 {
 	my $LineCount = 0;
@@ -240,5 +252,16 @@ while ($FileRevision > 0)
 }
 
 DumpMysql($LATESTFILE);
+
+if ($BACKUPSERVER ne "")
+{
+        print "Offsite backup requested\n";
+        print "Copying $BACKUPDIR/coffeebackup-1.tgz to $BACKUPSERVER\n";
+        PrintDebugCommand("rsync -avz -e ssh $BACKUPDIR/coffeebackup-1.tgz $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH\n");
+        PrintDebugCommand("rsync -avz -e ssh $BACKUPDIR/coffeemud.sql-1 $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
+        system ("rsync -avz -e ssh $BACKUPDIR/coffeebackup-1.tgz $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
+        system ("rsync -avz -e ssh $BACKUPDIR/coffeemud.sql-1 $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
+}
+
 print("Done!\n");
 exit 0;

@@ -16,4 +16,14 @@ Official support sites: [Official Github Repo](https://github.com/fstltna/Coffee
 4. Edit the backup config:
  	Run a manual backup and it will ask you for the mysql config info. If you need to reconfigure it use the "-prefs" command-line option
 
+---
+
+To set up offsite backups:
+
+1. Make sure ssh-keygen is installed: "apt install ssh-keygen"
+2. Run "ssh-keygen" and when asked for the password just press enter twice
+3. Run "ssh-copy-id -i ~/.ssh/id_rsa.pub your-destination-server" - This will ask you for your remote password. This is normal.
+4. Run "coffeebackup -prefs" and update the backup fields
+5. Rerun the backup and it should try and upload the files to your remote site.
+
 If you need more help visit https://PocketMUD.com/
