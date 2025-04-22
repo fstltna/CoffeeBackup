@@ -5,7 +5,7 @@ my $MTDIR = "/home/cmowner/CoffeeMud";
 my $BACKUPDIR = "/home/cmowner/backups";
 my $TARCMD = "/bin/tar czf";
 my $SQLDUMPCMD = "/usr/bin/mysqldump";
-my $VERSION = "1.7.2";
+my $VERSION = "1.8.0";
 my $OPTION_FILE = "/home/cmowner/.cmbackuprc";
 my $LATESTFILE = "$BACKUPDIR/coffeemud.sql-1";
 my $DOSNAPSHOT = 0;
@@ -19,6 +19,12 @@ if ($FILEEDITOR eq "")
 	$FILEEDITOR = "/usr/bin/nano";
 }
 
+my $BACKUPUSER = "";
+my $BACKUPPASS = "";
+my $BACKUPSERVER = "";
+my $BACKUPPATH = "";
+my $DEBUG_MODE = "off";
+
 my $templatefile = <<'END_TEMPLATE';
 # Put mysql user here
 coffeemud
@@ -26,8 +32,15 @@ coffeemud
 changeme
 # Put database name here
 coffeemud
+# Backup User
+backupuser
+# Backup Pswd
+backuppass
+# Backup Server
+backupserver
+# Backup Path
+backuppath
 END_TEMPLATE
-
 
 # Get if they said a option
 my $CMDOPTION = shift;
@@ -66,6 +79,22 @@ sub ReadPrefs
 		elsif ($LineCount == 2)
 		{
 			$MYSQLDBNAME = $row;
+		}
+		elsif ($LineCount == 3)
+		{
+			$BACKUPUSER = $row;
+		}
+		elsif ($LineCount == 4)
+		{
+			$BACKUPPASS = $row;
+		}
+		elsif ($LineCount == 5)
+		{
+			$BACKUPSERVER = $row;
+		}
+		elsif ($LineCount == 6)
+		{
+			$BACKUPPATH = $row;
 		}
 		$LineCount += 1;
 	}
@@ -156,6 +185,7 @@ if ((defined $CMDOPTION) && ($CMDOPTION eq "-prefs"))
 		close($fh);
 	}
 	system("$FILEEDITOR $OPTION_FILE");
+	print "Prefs saved - please re-run the backup\n";
 	exit 0;
 }
 
