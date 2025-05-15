@@ -5,7 +5,7 @@ my $MTDIR = "/home/cmowner/CoffeeMud";
 my $BACKUPDIR = "/home/cmowner/backups";
 my $TARCMD = "/bin/tar czf";
 my $SQLDUMPCMD = "/usr/bin/mysqldump";
-my $VERSION = "1.8.0";
+my $VERSION = "1.8.1";
 my $OPTION_FILE = "/home/cmowner/.cmbackuprc";
 my $LATESTFILE = "$BACKUPDIR/coffeemud.sql-1";
 my $DOSNAPSHOT = 0;
@@ -133,7 +133,7 @@ sub DumpMysql
 {
 	my $DUMPFILE = $_[0];
 
-	print "Backing up MYSQL data: ";
+	print "Backup Completed.\nBacking up MYSQL data: ";
 	if (-f "$DUMPFILE")
 	{
 		unlink("$DUMPFILE");
@@ -160,7 +160,7 @@ sub SnapShotFunc
 		unlink("$BACKUPDIR/snapshot.tgz");
 	}
 	system("$TARCMD $BACKUPDIR/snapshot.tgz $MTDIR > /dev/null 2>\&1");
-	print "\nBackup Completed.\nBacking up MYSQL data: ";
+	print "Backup Completed.\nBacking up MYSQL data: ";
 	if (-f "$BACKUPDIR/snapshot.sql")
 	{
 		unlink("$BACKUPDIR/snapshot.sql");
