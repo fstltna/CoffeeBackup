@@ -5,7 +5,7 @@ my $MTDIR = "/home/cmowner/CoffeeMud";
 my $BACKUPDIR = "/home/cmowner/backups";
 my $TARCMD = "/bin/tar czf";
 my $SQLDUMPCMD = "/usr/bin/mysqldump";
-my $VERSION = "1.9.0";
+my $VERSION = "1.9.1";
 my $OPTION_FILE = "/home/cmowner/.cmbackuprc";
 my $LATESTFILE = "$BACKUPDIR/coffeemud.sql-1";
 my $DOSNAPSHOT = 0;
@@ -66,6 +66,8 @@ sub ReadPrefs
 		print ($fh $templatefile);
 		close($fh);
 		system("$FILEEDITOR $OPTION_FILE");
+		print "Settings created. Please re-run the backup\n";
+		exit 0;
 	}
 
 	open(my $fh, '<:encoding(UTF-8)', $OPTION_FILE)
