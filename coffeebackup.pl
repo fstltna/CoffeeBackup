@@ -5,7 +5,7 @@ my $MTDIR = "/home/cmowner/CoffeeMud";
 my $BACKUPDIR = "/home/cmowner/backups";
 my $TARCMD = "/bin/tar czf";
 my $SQLDUMPCMD = "/usr/bin/mysqldump";
-my $VERSION = "1.8.1";
+my $VERSION = "1.9.0";
 my $OPTION_FILE = "/home/cmowner/.cmbackuprc";
 my $LATESTFILE = "$BACKUPDIR/coffeemud.sql-1";
 my $DOSNAPSHOT = 0;
@@ -26,20 +26,20 @@ my $BACKUPPATH = "";
 my $DEBUG_MODE = "off";
 
 my $templatefile = <<'END_TEMPLATE';
-# Put mysql user here
+# --- Put mysql user here
 coffeemud
-# Put mysql password here
+# --- Put mysql password here
 changeme
-# Put database name here
+# --- Put database name here
 coffeemud
-# Backup User
-backupuser
-# Backup Pswd
-backuppass
-# Backup Server
-backupserver
-# Backup Path
-backuppath
+# --- Backup User
+#backupuser
+# --- Backup Pswd
+#backuppass
+# --- Backup Server
+#backupserver
+# --- Backup Path
+#backuppath
 END_TEMPLATE
 
 # Get if they said a option
@@ -133,14 +133,14 @@ sub DumpMysql
 {
 	my $DUMPFILE = $_[0];
 
-	print "Backup Completed.\nBacking up MYSQL data: ";
+	print "Backing up MYSQL data: ";
 	if (-f "$DUMPFILE")
 	{
 		unlink("$DUMPFILE");
 	}
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
-	system("$SQLDUMPCMD --user=$MYSQLUSER --password=$MYSQLPSWD --result-file=$DUMPFILE $MYSQLDBNAME");
-	print "\n";
+	system("$SQLDUMPCMD --user=$MYSQLUSER --password=$MYSQLPSWD --result-file=$DUMPFILE $MYSQLDBNAME > /dev/null 2>\&1");
+	print "Done\n";
 }
 
 if (defined $CMDOPTION)
@@ -160,18 +160,25 @@ sub SnapShotFunc
 		unlink("$BACKUPDIR/snapshot.tgz");
 	}
 	system("$TARCMD $BACKUPDIR/snapshot.tgz $MTDIR > /dev/null 2>\&1");
-	print "Backup Completed.\nBacking up MYSQL data: ";
+	print "Backup Completed.\n";
 	if (-f "$BACKUPDIR/snapshot.sql")
 	{
 		unlink("$BACKUPDIR/snapshot.sql");
 	}
 	# print "User = $MYSQLUSER, PSWD = $MYSQLPSWD\n";
 	DumpMysql("$BACKUPDIR/snapshot.sql");
-	print "\n";
-	PrintDebugCommand("rsync -avz -e ssh $BACKUPDIR/snapshot.tgz $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH\n");
-        PrintDebugCommand("rsync -avz -e ssh $BACKUPDIR/snapshot.sql $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
-        system ("rsync -avz -e ssh $BACKUPDIR/snapshot.tgz $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
-        system ("rsync -avz -e ssh $BACKUPDIR/snapshot.sql $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
+	if ($BACKUPSERVER ne "")
+	{       
+		print "Offsite backup requested\n";
+		print "Copying $BACKUPDIR/snapshot.tgz to $BACKUPSERVER: ";
+		PrintDebugCommand("rsync -avz -e ssh $BACKUPDIR/snapshot.tgz $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH\n");
+		system ("rsync -avz -e ssh $BACKUPDIR/snapshot.tgz $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
+		print "Done\n";
+		print "Copying $BACKUPDIR/snapshot.sql to $BACKUPSERVER: ";
+		PrintDebugCommand("rsync -avz -e ssh $BACKUPDIR/snapshot.sql $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
+		system ("rsync -avz -e ssh $BACKUPDIR/snapshot.sql $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
+		print("Done!\n");
+	}
 }
 
 #-------------------
@@ -237,7 +244,7 @@ while ($FileRevision > 0)
 }
 
 print "Done\nCreating New Backup: ";
-system("$TARCMD $BACKUPDIR/coffeebackup-1.tgz $MTDIR");
+system("$TARCMD $BACKUPDIR/coffeebackup-1.tgz $MTDIR > /dev/null 2>\&1");
 print "Done\nMoving Existing MySQL data: ";
 if (-f "$BACKUPDIR/coffeemud.sql-5")
 {
@@ -255,6 +262,8 @@ while ($FileRevision > 0)
 	$FileRevision -= 1;
 }
 
+print "Done\n";
+
 DumpMysql($LATESTFILE);
 
 if ($BACKUPSERVER ne "")
@@ -265,7 +274,7 @@ if ($BACKUPSERVER ne "")
         PrintDebugCommand("rsync -avz -e ssh $BACKUPDIR/coffeemud.sql-1 $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
         system ("rsync -avz -e ssh $BACKUPDIR/coffeebackup-1.tgz $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
         system ("rsync -avz -e ssh $BACKUPDIR/coffeemud.sql-1 $BACKUPUSER\@$BACKUPSERVER:$BACKUPPATH");
+	print("Done!\n");
 }
 
-print("Done!\n");
 exit 0;
